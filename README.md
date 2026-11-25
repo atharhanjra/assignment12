@@ -4,11 +4,11 @@ A FastAPI calculator app with a secure user model, built for Module 10. Users ar
 
 ## Docker Hub
 
-Image: **https://hub.docker.com/r/atharhanjra/assignment11**
+Image: **https://hub.docker.com/r/atharhanjra/assignment12**
 
 ```
-docker pull atharhanjra/assignment11:latest
-docker run -p 8000:8000 atharhanjra/assignment11:latest
+docker pull atharhanjra/assignment12:latest
+docker run -p 8000:8000 atharhanjra/assignment12:latest
 ```
 
 Then open http://localhost:8000.
@@ -30,12 +30,50 @@ To run only the calculation tests:
 
     pytest tests/unit/test_calculation_factory.py tests/unit/test_calculation_schemas.py tests/integration/test_calculation_db.py
 
+## API Routes (Module 12)
+
+**Users** (`app/routes/users.py`)
+
+| Method | Route | What it does |
+|---|---|---|
+| POST | `/users/register` | Create a user (password is hashed). Returns 201, or 400 if the username/email is taken |
+| POST | `/users/login` | Check username and password. Returns 200, or 401 if they don't match |
+
+**Calculations** (`app/routes/calculations.py`)
+
+| Method | Route | What it does |
+|---|---|---|
+| GET | `/calculations` | Browse all calculations |
+| GET | `/calculations/{id}` | Read one calculation (404 if not found) |
+| PUT | `/calculations/{id}` | Edit a calculation and recompute its result |
+| POST | `/calculations` | Add a calculation for an existing user (201) |
+| DELETE | `/calculations/{id}` | Delete a calculation (204) |
+
+Invalid data (bad email, unknown type, dividing by zero) returns 400.
+
+## Manual Checks with OpenAPI
+
+1. Start the database and the app:
+   docker compose up -d db
+   python main.py
+2. Open http://127.0.0.1:8000/docs
+3. For each route, click it, then **Try it out**, enter the JSON, and click **Execute**:
+   - Register: `{"username": "alice", "email": "alice@example.com", "password": "secret123"}`
+   - Login: `{"username": "alice", "password": "secret123"}`
+   - Add: `{"a": 10, "b": 4, "type": "Divide", "user_id": 1}`
+   - Browse: no body needed
+4. Check the **Server response** code and body.
+
+To run only the route integration tests:
+
+    pytest tests/integration/test_routes.py
+
 ## Running the Tests Locally
 
 1. Set up the project:
    ```
-   git clone https://github.com/atharhanjra/assignment11.git
-   cd assignment11
+   git clone https://github.com/atharhanjra/assignment12.git
+   cd assignment12
    python3 -m venv venv
    source venv/bin/activate
    pip install -r requirements.txt
@@ -66,4 +104,4 @@ The workflow in `.github/workflows/test.yml` runs on every push to `main`:
 
 1. **test:** runs all tests with a PostgreSQL service container
 2. **security:** builds the Docker image and scans it with Trivy
-3. **deploy:** pushes the image to Docker Hub as `atharhanjra/assignment11`
+3. **deploy:** pushes the image to Docker Hub as `atharhanjra/assignment12`

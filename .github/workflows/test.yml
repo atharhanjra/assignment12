@@ -91,5 +91,5 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/assignment11:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/assignment11:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/assignment12:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/assignment12:${{ github.sha }}
