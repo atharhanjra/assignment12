@@ -9,11 +9,32 @@ from app.operations import add, subtract, multiply, divide  # Ensure correct imp
 import uvicorn
 import logging
 
+from contextlib import asynccontextmanager
+
+from sqlalchemy.exc import OperationalError
+
+from app.database import Base, engine
+from app.routes import calculations, users
+
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Create the database tables when the server starts."""
+    try:
+        Base.metadata.create_all(bind=engine)
+    except OperationalError:
+        logger.warning("Database not available: user and calculation routes will not work.")
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+
+# User routes (/users/...) and calculation routes (/calculations/...)
+app.include_router(users.router)
+app.include_router(calculations.router)
 
 # Setup templates directory
 templates = Jinja2Templates(directory="templates")
