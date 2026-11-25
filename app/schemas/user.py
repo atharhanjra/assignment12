@@ -30,3 +30,16 @@ class UserRead(BaseModel):
     username: str
     email: EmailStr
     created_at: datetime
+
+class UserLogin(BaseModel):
+    """Data needed to log in."""
+
+    username: str
+    password: str
+
+
+class LoginResponse(BaseModel):
+    """What a successful login returns."""
+
+    message: str
+    user: UserRead

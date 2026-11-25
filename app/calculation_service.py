@@ -28,3 +28,29 @@ def create_calculation(db: Session, calc_in: CalculationCreate) -> Calculation:
     db.commit()
     db.refresh(calculation)
     return calculation
+
+def list_calculations(db: Session):
+    """Return every calculation, oldest first."""
+    return db.query(Calculation).order_by(Calculation.id).all()
+
+
+def get_calculation(db: Session, calc_id: int):
+    """Return one calculation, or None if it doesn't exist."""
+    return db.get(Calculation, calc_id)
+
+
+def update_calculation(db: Session, calculation: Calculation, calc_in) -> Calculation:
+    """Change a calculation's numbers or type, and recompute its result."""
+    calculation.a = calc_in.a
+    calculation.b = calc_in.b
+    calculation.type = calc_in.type.value
+    calculation.result = CalculationFactory.compute(calculation.type, calc_in.a, calc_in.b)
+    db.commit()
+    db.refresh(calculation)
+    return calculation
+
+
+def delete_calculation(db: Session, calculation: Calculation) -> None:
+    """Remove a calculation."""
+    db.delete(calculation)
+    db.commit()

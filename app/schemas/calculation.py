@@ -20,13 +20,12 @@ class CalculationType(str, Enum):
     DIVIDE = "Divide"
 
 
-class CalculationCreate(BaseModel):
-    """Data needed to create a calculation."""
+class CalculationBase(BaseModel):
+    """Fields shared by creating and editing a calculation."""
 
     a: float
     b: float
     type: CalculationType
-    user_id: int
 
     @model_validator(mode="after")
     def check_no_zero_divisor(self):
@@ -34,6 +33,16 @@ class CalculationCreate(BaseModel):
         if self.type == CalculationType.DIVIDE and self.b == 0:
             raise ValueError("Cannot divide by zero")
         return self
+
+
+class CalculationCreate(CalculationBase):
+    """Data needed to create a calculation."""
+
+    user_id: int
+
+
+class CalculationUpdate(CalculationBase):
+    """Data that can be changed when editing a calculation."""
 
 
 class CalculationRead(BaseModel):
